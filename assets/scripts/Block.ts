@@ -1,4 +1,5 @@
 import Utils from "./Utils";
+import {Colors} from "./interface";
 
 const {ccclass, property} = cc._decorator;
 
@@ -10,28 +11,29 @@ export default class Block extends cc.Component {
     NumberLabel: cc.Label = null;
 
 
-    // 记录是不是没有数字
-    public isNull: boolean = false;
 
     // 格式化
     public init(number: number, size: number, pos: cc.Vec2): void {
-        Utils.Colors.forEach((item, index) => {
-            this.node.width = size;
-            this.node.height = size;
-            this.node.position = pos;
-            if (item.number === number) {
-                this.node.color = item.color;
-                if (number === 0)
-                    this.NumberLabel.string = '';
-                else
-                    this.NumberLabel.string = number + '';
-                return;
-            }
-        })
+        this.node.width = size;
+        this.node.height = size;
+        this.node.position = pos;
+        this.setNumber(number);
     }
 
+    public setNumber(number: number): void {
+        if (number === 0)
+            this.NumberLabel.node.active = false;
+        else
+            this.NumberLabel.string = number + '';
 
-
+        for (let i = 0; i < Utils.Colors.length; i++) {
+            const item: Colors = Utils.Colors[i];
+            if (number === item.number) {
+                this.node.color = item.color;
+                break;
+            }
+        }
+    }
 
     // update (dt) {}
 }

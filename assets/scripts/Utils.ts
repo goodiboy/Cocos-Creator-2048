@@ -1,3 +1,5 @@
+import {Colors} from "./interface";
+
 export default class Utils {
     // 颜色数组
     public static Colors: Array<Colors> = [
@@ -57,7 +59,11 @@ export default class Utils {
     // 间隔大小
     public static GAP: number = 20;
 
+    // 随机的数字
     public static initialNumber: number[] = [2, 4];
+
+    // 最小滑动距离
+    public  static MIN_TOUCH_DIR = 50;
 
     public static random(min: number, max: number): number {
         if (max <= min) {
@@ -65,12 +71,4 @@ export default class Utils {
         }
         return Math.floor(Math.random() * (max - min) + min);
     }
-}
-
-// 颜色接口
-interface Colors {
-    // 块的数字
-    number: number;
-    // 块的颜色
-    color: cc.Color;
 }

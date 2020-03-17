@@ -300,23 +300,6 @@ export default class Main extends cc.Component {
         }
     }
 
-    /**
-     * 检查失败，每个格子上下左右都不能移动的时候，游戏结束
-     */
-    private checkFail(): boolean {
-        for (let i = 0; i < Utils.ROWS; i++) {
-            for (let j = 0; j < Utils.ROWS; j++) {
-                const data = this.blockData[i][j];
-                if (data === 0) return false;
-                if (j > 0 && data === this.blockData[i][j - 1]) return false;
-                if (j < Utils.ROWS && data === this.blockData[i][j + 1]) return false;
-                if (i > 0 && this.blockData[i - 1][j] === data) return false;
-                if (i < Utils.ROWS && data === this.blockData[i + 1][j]) return false;
-            }
-        }
-        return true;
-    }
-
 
     private moveAnimDown(i: number, j: number, callback: Function): void {
         if (i === 0 || this.blockData[i][j] === 0) {
@@ -417,6 +400,24 @@ export default class Main extends cc.Component {
 
 
     /**
+     * 检查失败，每个格子上下左右都不能移动的时候，游戏结束
+     */
+    private checkFail(): boolean {
+        for (let i = 0; i < Utils.ROWS; i++) {
+            for (let j = 0; j < Utils.ROWS; j++) {
+                const data = this.blockData[i][j];
+                if (data === 0) return false;
+                if (j > 0 && data === this.blockData[i][j - 1]) return false;
+                if (j < Utils.ROWS && data === this.blockData[i][j + 1]) return false;
+                if (i > 0 && this.blockData[i - 1][j] === data) return false;
+                if (i < Utils.ROWS && data === this.blockData[i + 1][j]) return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
      * 合并数字
      * @param b1 目标块（需要销毁的）
      * @param b2 当前块
@@ -466,7 +467,7 @@ export default class Main extends cc.Component {
         this.GameOverLayer.active = false;
         this.updateScore();
         // 节点的数量实时更新，所以要从后面减开始
-        for (let i = this.ForeLayerNode.childrenCount; i >=0 ; i--) {
+        for (let i = this.ForeLayerNode.childrenCount; i >= 0; i--) {
             this.BlockPool.put(this.ForeLayerNode.children[i]);
         }
 

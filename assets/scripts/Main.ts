@@ -43,6 +43,9 @@ export default class Main extends cc.Component {
     // 初始点击位置
     private startPoint: cc.Vec2;
 
+    // 本次滑动是否合并过
+    private isMergeArr: boolean[][] = [];
+
     // 是否有移动
     private hasMove: boolean = false;
 
@@ -86,6 +89,7 @@ export default class Main extends cc.Component {
             case 'left':
                 for (let i = 0; i < Utils.ROWS; i++) {
                     for (let j = 0; j < Utils.ROWS; j++) {
+                        this.isMergeArr[i][j] = false;
                         if (this.blockData[i][j] !== 0) {
                             moveBlock.push({i, j});
                         }
@@ -101,8 +105,9 @@ export default class Main extends cc.Component {
                 }
                 break;
             case 'right':
-                for (let i=0; i<Utils.ROWS; ++i) {
-                    for (let j=Utils.ROWS-1; j>=0; --j) {
+                for (let i = 0; i < Utils.ROWS; ++i) {
+                    for (let j = Utils.ROWS - 1; j >= 0; --j) {
+                        this.isMergeArr[i][j] = false;
                         if (this.blockData[i][j] != 0) {
                             moveBlock.push({i, j});
                         }
@@ -120,6 +125,7 @@ export default class Main extends cc.Component {
             case 'down':
                 for (let i = 0; i < Utils.ROWS; i++) {
                     for (let j = 0; j < Utils.ROWS; j++) {
+                        this.isMergeArr[i][j] = false;
                         if (this.blockData[i][j] !== 0) {
                             moveBlock.push({i, j});
                         }
@@ -135,8 +141,9 @@ export default class Main extends cc.Component {
                 }
                 break;
             case 'up':
-                for (let i=0; i<Utils.ROWS; ++i) {
-                    for (let j=Utils.ROWS-1; j>=0; --j) {
+                for (let i = Utils.ROWS - 1; i >= 0; i--) {
+                    for (let j = Utils.ROWS - 1; j >= 0; --j) {
+                        this.isMergeArr[i][j] = false;
                         if (this.blockData[i][j] != 0) {
                             moveBlock.push({i, j});
                         }
@@ -181,10 +188,11 @@ export default class Main extends cc.Component {
                 })
                 .start();
             this.hasMove = true;
-        } else if (this.blockData[i][j - 1] === this.blockData[i][j]) {
+        } else if (this.blockData[i][j - 1] === this.blockData[i][j] && !this.isMergeArr[i][j]) {
             let block: cc.Node = this.blocks[i][j];
             let position = this.blockPos[i][j - 1];
             this.blockData[i][j - 1] *= 2;
+            this.isMergeArr[i][j] = true;
             this.blocks[i][j] = null;
             this.blockData[i][j] = 0;
             cc.tween(block)
@@ -217,10 +225,11 @@ export default class Main extends cc.Component {
                 })
                 .start();
             this.hasMove = true;
-        } else if (this.blockData[i][j + 1] === this.blockData[i][j]) {
+        } else if (this.blockData[i][j + 1] === this.blockData[i][j] && !this.isMergeArr[i][j]) {
             let block: cc.Node = this.blocks[i][j];
             let position = this.blockPos[i][j + 1];
             this.blockData[i][j + 1] *= 2;
+            this.isMergeArr[i][j] = true;
             this.blocks[i][j] = null;
             this.blockData[i][j] = 0;
             cc.tween(block)
@@ -240,30 +249,31 @@ export default class Main extends cc.Component {
         if (i === 0 || this.blockData[i][j] === 0) {
             callback && callback();
             return;
-        } else if (this.blockData[i-1][j] === 0) {
+        } else if (this.blockData[i - 1][j] === 0) {
             let block: cc.Node = this.blocks[i][j];
-            let position = this.blockPos[i-1][j];
-            this.blocks[i-1][j] = block;
-            this.blockData[i-1][j] = this.blockData[i][j];
+            let position = this.blockPos[i - 1][j];
+            this.blocks[i - 1][j] = block;
+            this.blockData[i - 1][j] = this.blockData[i][j];
             this.blockData[i][j] = 0;
             this.blocks[i][j] = null;
             cc.tween(block)
                 .to(0.1, {position: position})
                 .call(e => {
-                    this.moveAnimDown(i-1, j, callback);
+                    this.moveAnimDown(i - 1, j, callback);
                 })
                 .start();
             this.hasMove = true;
-        } else if (this.blockData[i-1][j] === this.blockData[i][j]) {
+        } else if (this.blockData[i - 1][j] === this.blockData[i][j] &&!this.isMergeArr[i][j]) {
             let block: cc.Node = this.blocks[i][j];
-            let position = this.blockPos[i-1][j];
-            this.blockData[i-1][j] *= 2;
+            let position = this.blockPos[i - 1][j];
+            this.blockData[i - 1][j] *= 2;
+            this.isMergeArr[i][j] = true;
             this.blocks[i][j] = null;
             this.blockData[i][j] = 0;
             cc.tween(block)
                 .to(0.1, {position: position})
                 .call(e => {
-                    this.doMerge(block, this.blocks[i-1][j], this.blockData[i-1][j], callback)
+                    this.doMerge(block, this.blocks[i - 1][j], this.blockData[i - 1][j], callback)
                 })
                 .start();
             this.hasMove = true;
@@ -276,30 +286,31 @@ export default class Main extends cc.Component {
         if (i === Utils.ROWS - 1 || this.blockData[i][j] === 0) {
             callback && callback();
             return;
-        } else if (this.blockData[i+1][j] === 0) {
+        } else if (this.blockData[i + 1][j] === 0) {
             let block: cc.Node = this.blocks[i][j];
-            let position = this.blockPos[i+1][j];
-            this.blocks[i+1][j] = block;
-            this.blockData[i+1][j] = this.blockData[i][j];
+            let position = this.blockPos[i + 1][j];
+            this.blocks[i + 1][j] = block;
+            this.blockData[i + 1][j] = this.blockData[i][j];
             this.blockData[i][j] = 0;
             this.blocks[i][j] = null;
             cc.tween(block)
                 .to(0.1, {position: position})
                 .call(e => {
-                    this.moveAnimUp(i+1, j, callback);
+                    this.moveAnimUp(i + 1, j, callback);
                 })
                 .start();
             this.hasMove = true;
-        } else if (this.blockData[i+1][j] === this.blockData[i][j]) {
+        } else if (this.blockData[i + 1][j] === this.blockData[i][j] && !this.isMergeArr[i][j]) {
             let block: cc.Node = this.blocks[i][j];
-            let position = this.blockPos[i+1][j];
-            this.blockData[i+1][j] *= 2;
+            let position = this.blockPos[i + 1][j];
+            this.blockData[i + 1][j] *= 2;
+            this.isMergeArr[i][j] = true;
             this.blocks[i][j] = null;
             this.blockData[i][j] = 0;
             cc.tween(block)
                 .to(0.1, {position: position})
                 .call(e => {
-                    this.doMerge(block, this.blocks[i+1][j], this.blockData[i+1][j], callback)
+                    this.doMerge(block, this.blocks[i + 1][j], this.blockData[i + 1][j], callback)
                 })
                 .start();
             this.hasMove = true;
@@ -357,13 +368,17 @@ export default class Main extends cc.Component {
 
         for (let i = 0; i < Utils.ROWS; i++) {
             this.blockData[i] = [];
+            this.isMergeArr[i] = [];
             this.blocks[i] = [];
             for (let j = 0; j < Utils.ROWS; j++) {
                 this.blockData[i][j] = 0;
                 this.blocks[i][j] = null;
+                this.isMergeArr[i][j] = false;
             }
         }
-        this.createBlock();
+        for (let i = 0; i < 13; i++) {
+            this.createBlock();
+        }
     }
 
 
@@ -374,20 +389,18 @@ export default class Main extends cc.Component {
             block = this.BlockPool.get();
         }
 
-        for (let i = 0; i < 3; i++) {
-            let emptyBlock = this.getEmptyBlock();
-            if (emptyBlock.length < 1) {
-                // todo
-                return;
-            }
-            block = cc.instantiate(this.BlockPrefab);
-            let location = emptyBlock[Utils.random(0, emptyBlock.length)];
-            const num = Utils.initialNumber[Utils.random(0, 2)];
-            this.blockData[location.i][location.j] = num;
-            this.blocks[location.i][location.j] = block;
-            block.getComponent(Block).init(num, this.blockSize, this.blockPos[location.i][location.j]);
-            block.parent = this.ForeLayerNode;
+        let emptyBlock = this.getEmptyBlock();
+        if (emptyBlock.length < 1) {
+            // todo
+            return;
         }
+        block = cc.instantiate(this.BlockPrefab);
+        let location = emptyBlock[Utils.random(0, emptyBlock.length)];
+        const num = Utils.initialNumber[Utils.random(0, 2)];
+        this.blockData[location.i][location.j] = num;
+        this.blocks[location.i][location.j] = block;
+        block.parent = this.ForeLayerNode;
+        block.getComponent(Block).init(num, this.blockSize, this.blockPos[location.i][location.j]);
     }
 
     //  查找空的块

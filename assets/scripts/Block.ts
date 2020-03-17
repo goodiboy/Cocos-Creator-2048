@@ -14,9 +14,11 @@ export default class Block extends cc.Component {
 
     // 格式化
     public init(number: number, size: number, pos: cc.Vec2): void {
+        this.node.scale = 0;
         this.node.width = size;
         this.node.height = size;
         this.node.position = pos;
+        this.node.runAction(cc.scaleTo(0.1,1));
         this.setNumber(number);
     }
 

@@ -63,7 +63,10 @@ export default class Utils {
     public static initialNumber: number[] = [2, 4];
 
     // 最小滑动距离
-    public  static MIN_TOUCH_DIR = 50;
+    public static MIN_TOUCH_DIR = 80;
+
+    // 滑动的时间
+    public static SLIDE_TIME: number = 0.2;
 
     public static random(min: number, max: number): number {
         if (max <= min) {

@@ -8,13 +8,13 @@ export interface Colors {
 
 // 方向枚举
 export enum Direction {
-    // 左方向
+    /**左方向*/
     LEFT = 'left',
-    // 右方向
+    /**右方向*/
     RIGHT = 'right',
-    // 上方向
+    /**上方向*/
     UP = 'up',
-    // 下方向
+    /**下方向*/
     DOWN = 'down',
 }
 
